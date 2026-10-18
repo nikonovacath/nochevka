@@ -142,6 +142,9 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
 @media (hover:hover) and (pointer:fine){.btn-main:not(:disabled):hover{background:#ffbd2e}}
 .pop-new .stack{display:flex;flex-direction:column;gap:10px}
 /* small alert at the top after sending */
+.game-layer{position:fixed;inset:0;z-index:100;background:var(--bg)}
+.game-layer iframe{display:block;width:100%;height:100%;border:0}
+html.game-open{overflow:hidden}
 .chip{position:fixed;left:50%;top:16px;z-index:60;translate:-50% -140%;background:var(--card);border:1.5px solid #000;border-radius:99px;padding:8px 18px;
   font-size:12px;line-height:18px;text-transform:uppercase;box-shadow:0 6px 18px -6px rgba(0,0,0,.3);opacity:0;visibility:hidden;pointer-events:none;
   transition:translate .3s cubic-bezier(.2,.8,.3,1),opacity .3s,visibility 0s .3s}
@@ -324,6 +327,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
   </form>
 </div>
 <div class="chip" id="chip" role="status" aria-live="polite"></div>
+<div class="game-layer" id="gameLayer" hidden></div>
 <div class="backdrop" id="about" hidden>
   <div class="pop" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
     <div class="pop-head"><p class="pop-title" id="aboutTitle">Что это такое?</p><button class="pop-close" id="aboutClose" type="button" aria-label="Закрыть">×</button></div>
@@ -668,6 +672,62 @@ musicBtn.addEventListener('click',()=>{MUSIC.on=!MUSIC.on;store.set('nochevka-mu
 document.addEventListener('pointerdown',()=>{const c=audioCtx();if(c&&c.state==='suspended')c.resume().catch(()=>{});if(MUSIC.on&&!MUSIC.src)startMusic();},{passive:true});
 document.addEventListener('visibilitychange',()=>{const c=SOUND.ctx;if(!c)return;document.hidden?c.suspend().catch(()=>{}):c.resume().catch(()=>{});});
 paintMusic();loadMusic();
+
+/* ---------- games open over the home page instead of replacing it, so the music never stops between pages ----------
+   The address bar still shows the game's own address (…/vishibali/?room=…), back/forward work, and a game opened on its own
+   (an invite, a reload) bounces through here and is opened straight away (see the small script at the top of each game). */
+const BASE=new URL('./',location.href),GAMES=['ugolki','vishibali'];
+const gameLayer=document.getElementById('gameLayer');
+let openSlug=null,syncTimer=null,homeScroll=0,gameFrame=null;
+const gameURL=(slug,q)=>new URL(slug+'/'+(q||''),BASE).href;
+function showGame(slug,q){
+  if(!openSlug)homeScroll=scrollY;
+  // a fresh frame each time: changing an existing frame's page would add steps to the browser's back/forward history
+  if(gameFrame)gameFrame.remove();
+  gameFrame=document.createElement('iframe');gameFrame.title='Игра';gameFrame.allow='autoplay; clipboard-write; web-share';
+  gameFrame.src=gameURL(slug,q);
+  gameFrame.addEventListener('load',()=>{try{if(openSlug)gameFrame.contentWindow.focus();}catch(e){}});
+  gameLayer.appendChild(gameFrame);
+  openSlug=slug;gameLayer.hidden=false;document.documentElement.classList.add('game-open');
+  clearInterval(syncTimer);syncTimer=setInterval(syncURL,400);
+}
+function hideGame(){
+  openSlug=null;clearInterval(syncTimer);
+  gameLayer.hidden=true;if(gameFrame){gameFrame.remove();gameFrame=null;} // leaving the game also leaves its online room
+  document.documentElement.classList.remove('game-open');document.title='Ночёвка';scrollTo(0,homeScroll);
+}
+// the game changes its own address (a room code, leaving a room): mirror it in the address bar, and take its title
+function syncURL(){
+  try{
+    const w=gameFrame&&gameFrame.contentWindow;if(!w||!openSlug||w.location.href==='about:blank')return;
+    const want=gameURL(openSlug,w.location.search);
+    if(location.href!==want)history.replaceState({game:openSlug},'',want);
+    if(w.document.title&&document.title!==w.document.title)document.title=w.document.title;
+  }catch(e){}
+}
+function openGame(slug,q){history.pushState({game:slug},'',gameURL(slug,q));showGame(slug,q);}
+addEventListener('popstate',e=>{
+  const st=e.state;
+  if(st&&st.game){if(openSlug!==st.game)showGame(st.game,location.search);}
+  else if(openSlug)hideGame();
+});
+document.querySelectorAll('a.game[href]').forEach(a=>a.addEventListener('click',e=>{
+  if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button)return; // «open in a new tab» still works
+  e.preventDefault();openGame(a.getAttribute('href').replace(/\/$/,''));
+}));
+// what the games call: the back arrow, and «the first tap happened inside the game» (so the music may start)
+window.nochevkaShell={
+  home(){if(history.state&&history.state.game)history.back();else{history.pushState(null,'',BASE.href);hideGame();}},
+  kick(){const c=audioCtx();if(c&&c.state==='suspended')c.resume().catch(()=>{});if(MUSIC.on&&!MUSIC.src)startMusic();},
+};
+// the games' sound and music buttons write the shared setting; follow it here, where the music actually plays
+addEventListener('storage',e=>{
+  if(e.key==='nochevka-sound'){SOUND.on=e.newValue!=='off';paintSound();}
+  if(e.key==='nochevka-music'){MUSIC.on=e.newValue!=='off';paintMusic();MUSIC.on?startMusic():stopMusic();}
+});
+// arrived from a game's own address: put the home page underneath (so «back» comes here) and open the game on top
+{const P=new URLSearchParams(location.search),g=P.get('open');
+ if(GAMES.includes(g)){history.replaceState(null,'',BASE.href);openGame(g,P.get('q')||'');}}
 </script>
 </body>
 </html>

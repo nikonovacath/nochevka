@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="ru">
 <head>
+<script>
+// «Ночёвка» opens its games inside the home page, so the music keeps playing between pages.
+// Opened on its own (a direct link, an invite, a reload)? Go through the home page, which opens this game right away. ?solo skips that.
+if(window.top===window&&!/[?&]solo(?:[&=]|$)/.test(location.search))location.replace(new URL('../?open=vishibali'+(location.search?'&q='+encodeURIComponent(location.search):''),location.href));
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Вышибалы</title>
@@ -661,7 +666,10 @@ paintSound();
 /* ---------- background music (same track and loop as «Уголки») ---------- */
 const MUSIC={on:store.get('nochevka-music')!=='off',buf:null,src:null,gain:null,loading:null,wanted:false,volume:0.25};
 const musicBtn=document.getElementById('musicBtn');
+// inside the home page the music is the home page's: one track, no gap between pages
+const SHELL=(()=>{try{return window.top!==window&&window.parent.nochevkaShell||null}catch(e){return null}})();
 function loadMusic(){
+  if(SHELL)return;
   const ctx=audioCtx();if(!ctx||MUSIC.loading)return;
   MUSIC.loading=fetch('sounds/music.mp3').then(r=>r.arrayBuffer()).then(a=>new Promise((res,rej)=>ctx.decodeAudioData(a,res,rej)))
     .then(b=>{MUSIC.buf=b;if(MUSIC.wanted)startMusic();}).catch(()=>{});
@@ -672,6 +680,7 @@ function musicBounds(b){
   return[0,Math.min(MUSIC_LEN,b.duration)];
 }
 function startMusic(){
+  if(SHELL)return;
   MUSIC.wanted=true;
   const ctx=audioCtx();if(!ctx||!MUSIC.on||MUSIC.src)return;
   if(!MUSIC.buf){loadMusic();return;}
@@ -689,7 +698,7 @@ function stopMusic(){
 }
 function paintMusic(){document.getElementById('musicIco').src=MUSIC.on?'assets/music-on.svg':'assets/music-off.svg';musicBtn.setAttribute('aria-label',MUSIC.on?'Выключить музыку':'Включить музыку');}
 musicBtn.addEventListener('click',()=>{MUSIC.on=!MUSIC.on;store.set('nochevka-music',MUSIC.on?'on':'off');paintMusic();MUSIC.on?startMusic():stopMusic();});
-document.addEventListener('pointerdown',()=>{if(MUSIC.on&&!MUSIC.src)startMusic();},{passive:true});
+document.addEventListener('pointerdown',()=>{if(SHELL){SHELL.kick();return;}if(MUSIC.on&&!MUSIC.src)startMusic();},{passive:true});
 document.addEventListener('visibilitychange',()=>{const c=SOUND.ctx;if(!c)return;document.hidden?c.suspend().catch(()=>{}):c.resume().catch(()=>{});});
 paintMusic();loadMusic();
 
@@ -879,7 +888,8 @@ function renderSide(){
 }
 function goHome(){clearTimeout(botTimer);loopId++;drag=null;clearAim();leaveRoom();G=null;screen='home';render();}
 topNew.addEventListener('click',()=>{closeMenu();goHome();});
-document.getElementById('topHome').addEventListener('click',()=>{location.href='../';});
+document.getElementById('topHome').addEventListener('click',()=>{if(SHELL)SHELL.home();else location.href='../';});
+document.querySelector('.home-link').addEventListener('click',e=>{if(SHELL){e.preventDefault();SHELL.home();}});
 const menuWrap=document.getElementById('menuWrap'),menuBtn=document.getElementById('menuBtn'),menuEl=document.getElementById('menu');
 function closeMenu(){menuEl.hidden=true;menuBtn.setAttribute('aria-expanded','false');}
 menuBtn.addEventListener('click',e=>{e.stopPropagation();const open=menuEl.hidden;menuEl.hidden=!open;menuBtn.setAttribute('aria-expanded',open);if(open)(topNew.hidden?document.getElementById('topHome'):topNew).focus();});
