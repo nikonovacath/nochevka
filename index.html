@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ночёвка</title>
+<title>На ночёвке</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="200x200" href="assets/favicon-200.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Sawarabi+Gothic&display=swap">
 <style>
@@ -105,7 +108,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
 .note{width:230px;height:230px;padding:24px;border:1px solid var(--line);border-radius:20px;display:flex;flex-direction:column;justify-content:space-between;
   font-size:12px;line-height:18px;overflow:hidden;rotate:-3deg;margin-bottom:-9px}
 .note p{margin:0;overflow-wrap:anywhere}
-.note .meta{display:flex;justify-content:space-between;color:var(--text);text-transform:uppercase;white-space:nowrap}
+.note .meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text);text-transform:uppercase;white-space:nowrap}
 .note{position:relative;transition:rotate .2s,scale .2s,box-shadow .2s}
 /* the tilt pattern of the design repeats every four notes */
 .note:nth-child(4n+2){rotate:3deg;translate:-4px 20px}
@@ -209,7 +212,7 @@ html.game-open{overflow:hidden}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>Ночёвка</h1><p class="sub">Игры из детства</p></div>
+    <div><h1>На ночёвке</h1><p class="sub">Игры из детства</p></div>
     <div class="head-actions">
     <button class="icon-btn" id="soundBtn" type="button"><img id="soundIco" src="assets/sound-on.svg" width="20" height="20" alt=""></button>
     <button class="icon-btn" id="musicBtn" type="button"><img id="musicIco" src="assets/music-on.svg" width="20" height="20" alt=""></button>
@@ -694,7 +697,7 @@ function showGame(slug,q){
 function hideGame(){
   openSlug=null;clearInterval(syncTimer);
   gameLayer.hidden=true;if(gameFrame){gameFrame.remove();gameFrame=null;} // leaving the game also leaves its online room
-  document.documentElement.classList.remove('game-open');document.title='Ночёвка';scrollTo(0,homeScroll);
+  document.documentElement.classList.remove('game-open');document.title='На ночёвке';scrollTo(0,homeScroll);
 }
 // the game changes its own address (a room code, leaving a room): mirror it in the address bar, and take its title
 function syncURL(){
