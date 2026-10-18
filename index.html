@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ночёвка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Sawarabi+Gothic&display=swap">
+<style>
+/* Same look as the games: cream page, header row, then a row of game cards (3 → 2 → 1 columns) */
+:root{
+  --bg:#f5eed9; --card:#fcf9f1; --line:#d5cfbe; --text:#575757; --yellow:#ffca57; --green:#8ddd68;
+  --f-head:"Sawarabi Gothic","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:#000;font-family:var(--f-mono);font-weight:500;font-size:14px;line-height:1.43;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px}
+.wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:var(--f-head);font-weight:400;font-size:24px;line-height:26px;letter-spacing:-.03em;margin:0}
+.sub{margin:2px 0 0;font-size:12px;line-height:19px;color:var(--text);text-transform:uppercase}
+button{font:inherit;cursor:pointer;color:#000;background:transparent;border:1px solid #000;border-radius:12px;padding:8px 18px;line-height:24px;text-transform:uppercase}
+button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.icon-btn{width:42px;height:42px;padding:0;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:12px;background:transparent}
+.icon-btn img{display:block;width:20px;height:20px}
+.icon-btn[aria-expanded="true"]{border-color:#000}
+.menu-wrap{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 6px);z-index:20;background:var(--card);border:1px solid #000;border-radius:16px;padding:8px;box-shadow:0 3px 11px -2px rgba(0,0,0,.25)}
+.menu-item{display:block;width:100%;border:0;border-radius:10px;padding:16px 17px;text-align:left;white-space:nowrap}
+
+/* game cards: a coloured rim (grey, the game's colour on hover) around a cream card */
+.games{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.game{--accent:#d4d4d4;--hover:var(--accent);display:flex;flex-direction:column;height:314px;padding:6px;border:2px solid #000;border-radius:32px;
+  background:#d4d4d4;color:#000;text-decoration:none;transition:background-color .15s}
+.game-in{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-between;padding:25px 25px 20px;background:var(--card);border:2px solid #000;border-radius:26px}
+.game .pic{position:relative;width:110px;height:71px;overflow:clip;flex:none}
+.game .pic.hand,.game .pic.board{width:100px}
+.game .pic-in{position:absolute;inset:0;transition:translate .25s cubic-bezier(.2,.8,.3,1)}
+.game .pic-in>*{position:absolute}
+.game .pic img{position:absolute;display:block;max-width:none}
+.txt{display:flex;flex-direction:column;gap:13px}
+.ttl{display:flex;flex-direction:column;gap:8px}
+.ttl b{font-family:var(--f-head);font-weight:400;font-size:24px;line-height:26px;letter-spacing:-.03em}
+.ttl span{font-size:12px;line-height:18px;color:var(--text);text-transform:uppercase}
+.play{display:block;background:var(--accent);border:1.5px solid #000;border-radius:12px;padding:9px 12px;font-size:14px;line-height:24px;text-align:center;text-transform:uppercase}
+.game.ugolki{--accent:var(--yellow)}
+.game.vishibali{--accent:var(--green)}
+.game.soon{--accent:#b9bbc0;--hover:#b6b6b6;cursor:default}
+.game.soon .ttl b{color:#727272}
+.game.soon .ttl span{color:#858585}
+.game.soon .play{border-color:#535456;color:rgba(0,0,0,.55)}
+/* hover: the rim takes the game's colour (on phones a tap goes straight into the game, so no sticky hover there) */
+@media (hover:hover) and (pointer:fine){
+  .game:hover{background:var(--hover)}
+}
+.game:focus-visible{background:var(--hover);outline-offset:3px}
+
+/* the three pictures, placed exactly as in the design: a drawn outline under a photo cut-out */
+.dice .outline{left:-.91px;top:-.8px;width:76.442px;height:70.934px;display:flex;align-items:center;justify-content:center}
+.dice .outline>div{position:relative;flex:none;width:43.148px;height:63.105px;rotate:56.25deg}
+.dice .outline img{inset:-4.43% -6.47% -4.43% -6.46%;width:auto;height:auto}
+.dice .photo{left:-3.16px;top:-5.01px;width:81.745px;height:79.398px;display:flex;align-items:center;justify-content:center}
+.dice .photo>div{position:relative;flex:none;width:48.171px;height:67.95px;rotate:57.35deg;transform:skewX(2.21deg)}
+.hand .outline{left:4px;top:7.04px;width:83.715px;height:53.208px}
+.hand .outline img{inset:-3.76% -2.39% -3.7% -2.39%;width:auto;height:auto}
+.hand .photo{left:calc(50% + 3.5px);top:calc(50% + .24px);width:99px;height:65.48px;translate:-50% -50%}
+.board .outline{left:-2.37px;top:-14.29px;width:104.221px;height:100.72px;display:flex;align-items:center;justify-content:center}
+.board .outline>div{position:relative;flex:none;width:80.148px;height:69.429px;rotate:-57.32deg;transform:skewX(4.06deg)}
+.board .outline img{inset:-2.48% -2.21% -2.47% -2.42%;width:auto;height:auto}
+.board .photo{left:-7px;top:-11px;width:113.172px;height:93.21px;display:flex;align-items:center;justify-content:center}
+.board .photo>div{position:relative;flex:none;width:90.396px;height:60.581px;rotate:-27.52deg;scale:1.03 .97;transform:skewX(3.82deg)}
+.photo img{inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.outline img{position:absolute}
+
+/* «Что это такое?» */
+.backdrop{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:16px}
+.pop{position:relative;width:100%;max-width:392px;background:var(--card);border:1px solid #000;border-radius:16px;padding:24px 25px;display:flex;flex-direction:column;gap:16px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+.pop-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pop-title{font-family:var(--f-head);font-weight:400;font-size:24px;line-height:26px;letter-spacing:-.03em;margin:0}
+.pop-close{border:0;padding:0;width:32px;height:32px;font-size:24px;line-height:1;text-transform:none}
+.pop-text{margin:0;color:var(--text);text-transform:uppercase;line-height:20px}
+.pop hr{height:1px;background:var(--line);border:0;margin:0}
+
+@media (max-width:960px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.games{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.game .pic-in{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>Ночёвка</h1><p class="sub">Игры из детства</p></div>
+    <div class="menu-wrap" id="menuWrap">
+      <button class="icon-btn" id="menuBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="menu" aria-label="Меню"><img src="assets/menu-dots-figma.svg" width="20" height="20" alt=""></button>
+      <div class="menu" id="menu" role="menu" hidden><button class="menu-item" id="aboutBtn" type="button" role="menuitem">Что это такое?</button></div>
+    </div>
+  </header>
+  <main class="games">
+    <a class="game ugolki" href="ugolki/">
+      <div class="game-in">
+        <div class="pic dice"><div class="pic-in">
+          <div class="outline"><div><img src="assets/dice-outline.svg" alt=""></div></div>
+          <div class="photo"><div><img src="assets/dice.png" alt=""></div></div>
+        </div></div>
+        <div class="txt">
+          <div class="ttl"><b>Уголки</b><span>игра на шахматной доске, которой научил дедушка</span></div>
+          <span class="play">Играть</span>
+        </div>
+      </div>
+    </a>
+    <a class="game vishibali" href="vishibali/">
+      <div class="game-in">
+        <div class="pic hand"><div class="pic-in">
+          <div class="outline"><img src="assets/hand-outline.svg" alt=""></div>
+          <div class="photo"><img src="assets/hand.png" alt=""></div>
+        </div></div>
+        <div class="txt">
+          <div class="ttl"><b>Вышибалы</b><span>в простонародье эта игра называется “чапаев”</span></div>
+          <span class="play">Играть</span>
+        </div>
+      </div>
+    </a>
+    <div class="game soon" aria-disabled="true">
+      <div class="game-in">
+        <div class="pic board"><div class="pic-in">
+          <div class="outline"><div><img src="assets/board-outline.svg" alt=""></div></div>
+          <div class="photo"><div><img src="assets/board.png" alt=""></div></div>
+        </div></div>
+        <div class="txt">
+          <div class="ttl"><b>Уголки 2</b><span>игра, где нужно стадо шашек переместить из угла в угол</span></div>
+          <span class="play">Игра в разработке</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="backdrop" id="about" hidden>
+  <div class="pop" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <div class="pop-head"><p class="pop-title" id="aboutTitle">Что это такое?</p><button class="pop-close" id="aboutClose" type="button" aria-label="Закрыть">×</button></div>
+    <hr>
+    <p class="pop-text">Дань ностальгии, семье и детству.</p>
+  </div>
+</div>
+<script>
+// «⋯» menu: opens under the button, closes on a click outside or Escape
+const menuWrap=document.getElementById('menuWrap'),menuBtn=document.getElementById('menuBtn'),menuEl=document.getElementById('menu'),
+  about=document.getElementById('about'),aboutBtn=document.getElementById('aboutBtn');
+function closeMenu(){menuEl.hidden=true;menuBtn.setAttribute('aria-expanded','false');}
+menuBtn.addEventListener('click',e=>{e.stopPropagation();const open=menuEl.hidden;menuEl.hidden=!open;menuBtn.setAttribute('aria-expanded',open);if(open)aboutBtn.focus();});
+document.addEventListener('click',e=>{if(!menuEl.hidden&&!menuWrap.contains(e.target))closeMenu();});
+function openAbout(){closeMenu();about.hidden=false;document.getElementById('aboutClose').focus();}
+function closeAbout(){about.hidden=true;menuBtn.focus();}
+aboutBtn.addEventListener('click',openAbout);
+document.getElementById('aboutClose').addEventListener('click',closeAbout);
+about.addEventListener('click',e=>{if(e.target===about)closeAbout();});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(!about.hidden)closeAbout();else if(!menuEl.hidden){closeMenu();menuBtn.focus();}
+});
+// hover: the picture leans a little towards the cursor
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.querySelectorAll('.game').forEach(card=>{
+  const pic=card.querySelector('.pic-in');
+  card.addEventListener('pointermove',e=>{
+    if(reduced||e.pointerType!=='mouse')return;
+    const r=card.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;
+    pic.style.translate=`${(dx*10).toFixed(1)}px ${(dy*8).toFixed(1)}px`;
+  });
+  card.addEventListener('pointerleave',()=>{pic.style.translate='';});
+});
+</script>
+</body>
+</html>
