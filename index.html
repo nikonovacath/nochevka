@@ -89,7 +89,11 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
 
 
 /* ---------- below the cards: notes in the middle, jam-water on the left, the exercise disk on the right ---------- */
-.extras{position:relative;margin-top:118px;min-height:770px}
+.extras{position:relative;margin-top:118px;min-height:620px}
+/* wide screens: the jar set (left) and the disk (right) keep the design's vertical distance between them (392px),
+   and the pair sits in the middle of the notes' height, however many notes there are */
+.deco{position:absolute;left:0;right:0;top:71px;bottom:0;pointer-events:none}
+.deco>*{pointer-events:auto}
 .notes-col{width:472px;margin:0 auto}
 .notes-head{display:flex;align-items:center;gap:24px}
 .notes-head>div{flex:1;min-width:0}
@@ -144,7 +148,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
 .note.c1{background:#ffda95}.note.c2{background:#ffcaca}.note.c3{background:#c4e9fc}.note.c4{background:#cdeaad}
 
 /* jam, cup and water jug: tap the jar or the jug to pour into the cup, tap the cup to drink */
-.jam{position:absolute;left:-14px;top:445px;width:189px;height:89px}
+.jam{position:absolute;left:-14px;top:calc(50% + 152px);width:189px;height:89px}
 .jam .obj{position:absolute;padding:0;border:0;background:none;border-radius:0;cursor:pointer;line-height:0;transition:translate .45s cubic-bezier(.45,0,.2,1),rotate .45s cubic-bezier(.45,0,.2,1)}
 .jam .obj img{width:100%;height:100%;display:block;pointer-events:none}
 .jam .jar{left:0;top:23px;width:64px;height:64px;z-index:3}
@@ -160,7 +164,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
 .jam .obj:focus-visible{outline:3px solid var(--yellow);outline-offset:2px;border-radius:8px}
 
 /* the exercise disk: still by default; tap to spin it, the motion lines show only while it turns */
-.disk-wrap{position:absolute;left:786px;top:53px;width:134px}
+.disk-wrap{position:absolute;left:786px;top:calc(50% - 240px);width:134px}
 .disk-cap{position:absolute;left:50%;translate:-50% 0;top:150px;width:220px;margin:0;font-size:12px;line-height:18px;color:var(--text);text-transform:uppercase;text-align:center;opacity:0;transition:opacity .3s;pointer-events:none}
 .disk-cap.on{opacity:1}
 .spinner{position:relative;display:block;width:134px;height:134px;padding:0;border:0;background:none;border-radius:50%;cursor:pointer}
@@ -180,7 +184,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
 /* when there is no room beside the notes: the jar set and the disk go under the notes, one below the other */
 @media (max-width:960px){
   .extras{min-height:0;display:flex;flex-direction:column;align-items:center;gap:96px}
-  .deco{display:flex;flex-direction:column;align-items:center;gap:32px;order:1}
+  .deco{position:static;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:32px;order:1}
   .jam,.disk-wrap{position:relative;left:auto;top:auto;flex:none}
   .disk-wrap{height:190px}
   .jam{height:126px}
@@ -281,7 +285,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
         <button class="btn-light" id="newNoteBtn" type="button">Оставить свою</button>
       </div>
       <div class="notes" id="notes" aria-live="polite"><p class="notes-empty">Загружаем записки…</p></div>
-      <div class="more-wrap" id="moreWrap" hidden><button class="btn-light" id="moreBtn" type="button">Загрузить ещё</button></div>
+      <div class="more-wrap" id="moreWrap" hidden><button class="btn-light" id="moreBtn" type="button">Показать ещё</button></div>
     </div>
   </section>
 </div>
@@ -367,7 +371,7 @@ const FB_CONFIG={
 const FB_SDK='https://www.gstatic.com/firebasejs/10.12.2/';
 const NOTES_PATH='nochevka/notes',LAST_PATH='nochevka/last';
 const MOCK=new URLSearchParams(location.search).has('mock'); // ?mock keeps notes in this browser only, for trying things out
-const NOTE_MAX=150,NOTE_LINES=7,FIRST=8,MORE=16,COOLDOWN=60000;
+const NOTE_MAX=150,NOTE_LINES=7,FIRST=6,MORE=6,COOLDOWN=60000;
 let fb=null,fbLoading=null,signing=null;
 async function firebase(){
   if(fb)return fb;
@@ -398,7 +402,9 @@ const hasSwear=t=>SWEAR.test(t.toLowerCase().replace(/[aeopcxykmtbh@036]/g,ch=>L
 const notesEl=document.getElementById('notes'),moreWrap=document.getElementById('moreWrap'),moreBtn=document.getElementById('moreBtn');
 let limit=FIRST,unsub=null,mockNotes=[];
 const ddmmyy=ts=>{const d=new Date(ts);return [d.getDate(),d.getMonth()+1,d.getFullYear()%100].map(n=>String(n).padStart(2,'0')).join('.');};
+let latestNotes=[]; // newest first, as shown
 function renderNotes(list,more){
+  latestNotes=list;
   notesEl.innerHTML=list.length?list.map(n=>`<article class="note c${n.color}">${n.type==='draw'?`<img class="pic" src="${n.img}" alt="Рисунок">`:`<p>${esc(n.text)}</p>`}<div class="meta"><span>${esc(n.name)}</span><span>${n.ts?ddmmyy(n.ts):''}</span></div></article>`).join('')
     :'<p class="notes-empty">Тут пока пусто. Оставь первую записку!</p>';
   moreWrap.hidden=!more;
@@ -420,6 +426,9 @@ async function listen(){
 }
 moreBtn.addEventListener('click',()=>{limit+=MORE;listen();});
 listen();
+// get the sign-in machinery ready while the page is idle, so neither opening the popup nor sending does heavy work on the spot
+// (Safari's sound can stutter when the page is busy right after a tap); nobody is signed in until they actually send a note
+if(!MOCK)(window.requestIdleCallback||setTimeout)(()=>firebase().then(f=>f.auth.authStateReady()).catch(()=>{}),{timeout:4000});
 
 /* the popup */
 const newNote=document.getElementById('newNote'),noteForm=document.getElementById('noteForm'),noteText=document.getElementById('noteText'),
@@ -427,12 +436,14 @@ const newNote=document.getElementById('newNote'),noteForm=document.getElementByI
   noteSend=document.getElementById('noteSend'),textBox=document.getElementById('textBox'),drawBox=document.getElementById('drawBox');
 const NOTE={kind:'text',color:1};
 function openNote(){
-  NOTE.color=1+Math.floor(Math.random()*4);
+  // a new note lands first, next to the two newest ones (beside/diagonal and below), so it takes a colour neither of them has;
+  // every note keeps its colour, and since all notes shift together, no two of a kind ever end up side by side
+  const near=latestNotes.slice(0,2).map(n=>n.color),free=[1,2,3,4].filter(c=>!near.includes(c));
+  NOTE.color=free[Math.floor(Math.random()*free.length)];
   document.getElementById('pad').style.setProperty('--pad',['#ffda95','#ffcaca','#c4e9fc','#cdeaad'][NOTE.color-1]);
   noteName.value=store.get('nochevka-name');
   newNote.hidden=false;showErr('');validate();
   (NOTE.kind==='text'?noteText:noteName).focus();
-  if(!MOCK)signIn().catch(()=>{});
 }
 function closeNote(){newNote.hidden=true;document.getElementById('newNoteBtn').focus();}
 document.getElementById('newNoteBtn').addEventListener('click',openNote);
