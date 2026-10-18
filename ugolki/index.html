@@ -31,6 +31,11 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .menu-item{display:block;width:100%;border:0;border-radius:10px;padding:16px 17px;text-align:left;white-space:nowrap}
 /* the game title doubles as the way back to all the games */
 .home-link{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;min-width:0}
+/* one line for the subtitle, so the header is the same 47px on every page and screen; on a narrow phone it ends in «…» */
+.home-link>div{min-width:0}
+.home-link .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* phones: no subtitle in the game header, the title alone; the header keeps the same 47px as on the home page */
+@media (max-width:680px){.home-link .sub{display:none}header{min-height:47px}}
 .home-link .back{flex:none;width:20px;height:20px;rotate:90deg;transition:translate .15s}
 @media (hover:hover) and (pointer:fine){.home-link:hover .back{translate:-3px 0}}
 .home-link:focus-visible{outline:3px solid var(--yellow);outline-offset:4px;border-radius:8px}
@@ -638,7 +643,7 @@ function restartOnline(){
 
 /* ---------- sound ---------- */
 // Web Audio: sounds are decoded once and started exactly on cue, so every cell of a move gets its own tap
-const SOUND={on:store.get('ugolki-sound')!=='off',ctx:null,buf:{},loading:{},log:null};
+const SOUND={on:store.get('nochevka-sound')!=='off',ctx:null,buf:{},loading:{},log:null};
 const SOUND_NAMES=['dice1','dice2','dice3','dice4','dice5','six','step','capture','home','turn','win','lose','tap','send','message'];
 function audioCtx(){
   if(SOUND.ctx)return SOUND.ctx;
@@ -672,14 +677,14 @@ document.addEventListener('pointerdown',()=>{const c=audioCtx();if(c&&c.state===
 function endSound(){const me=NET?NET.seat:mySeat();sfx(G.places[0]===me?'win':'lose');}
 const soundBtn=document.getElementById('soundBtn');
 function paintSound(){document.getElementById('soundIco').src=SOUND.on?'assets/sound-on.svg':'assets/sound-off.svg';soundBtn.setAttribute('aria-label',SOUND.on?'Выключить звук':'Включить звук');}
-soundBtn.addEventListener('click',()=>{SOUND.on=!SOUND.on;store.set('ugolki-sound',SOUND.on?'on':'off');paintSound();if(SOUND.on)sfx('tap');});
+soundBtn.addEventListener('click',()=>{SOUND.on=!SOUND.on;store.set('nochevka-sound',SOUND.on?'on':'off');paintSound();if(SOUND.on)sfx('tap');});
 // a soft tap on every control (buttons, menu, rules/moves panels); the dice button and the board have their own sounds
 document.addEventListener('click',e=>{const b=e.target.closest('button,summary');if(!b||b.disabled||b.id==='roll'||b.id==='chatSend'||b===soundBtn)return;sfx('tap');},true);
 paintSound();
 
 /* ---------- background music ---------- */
 // one looping track, quiet under the game sounds; its own button, remembered per browser; starts on the first tap (browsers block earlier)
-const MUSIC={on:store.get('ugolki-music')!=='off',buf:null,src:null,gain:null,loading:null,wanted:false,volume:0.25};
+const MUSIC={on:store.get('nochevka-music')!=='off',buf:null,src:null,gain:null,loading:null,wanted:false,volume:0.25};
 const musicBtn=document.getElementById('musicBtn');
 function loadMusic(){
   const ctx=audioCtx();if(!ctx||MUSIC.loading)return;
@@ -710,7 +715,7 @@ function stopMusic(){
   g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(g.gain.value,t);g.gain.linearRampToValueAtTime(0,t+0.4);src.stop(t+0.45);
 }
 function paintMusic(){document.getElementById('musicIco').src=MUSIC.on?'assets/music-on.svg':'assets/music-off.svg';musicBtn.setAttribute('aria-label',MUSIC.on?'Выключить музыку':'Включить музыку');}
-musicBtn.addEventListener('click',()=>{MUSIC.on=!MUSIC.on;store.set('ugolki-music',MUSIC.on?'on':'off');paintMusic();MUSIC.on?startMusic():stopMusic();});
+musicBtn.addEventListener('click',()=>{MUSIC.on=!MUSIC.on;store.set('nochevka-music',MUSIC.on?'on':'off');paintMusic();MUSIC.on?startMusic():stopMusic();});
 document.addEventListener('pointerdown',()=>{if(MUSIC.on&&!MUSIC.src)startMusic();},{passive:true});
 // pause everything while the tab is in the background (phones especially), pick up again on return
 document.addEventListener('visibilitychange',()=>{const c=SOUND.ctx;if(!c)return;document.hidden?c.suspend().catch(()=>{}):c.resume().catch(()=>{});});

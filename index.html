@@ -17,14 +17,15 @@
 html{-webkit-text-size-adjust:100%}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:#000;font-family:var(--f-mono);font-weight:500;font-size:14px;line-height:1.43;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px}
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px} /* same top as the games, so the header sits at the same height everywhere */
 .wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 h1{font-family:var(--f-head);font-weight:400;font-size:24px;line-height:26px;letter-spacing:-.03em;margin:0}
 .sub{margin:2px 0 0;font-size:12px;line-height:19px;color:var(--text);text-transform:uppercase}
 button{font:inherit;cursor:pointer;color:#000;background:transparent;border:1px solid #000;border-radius:12px;padding:8px 18px;line-height:24px;text-transform:uppercase}
 button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
-.icon-btn{width:42px;height:42px;padding:0;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:12px;background:transparent}
+.head-actions{display:flex;align-items:center;gap:8px}
+.icon-btn{width:42px;height:42px;padding:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:12px;background:transparent}
 .icon-btn img{display:block;width:20px;height:20px}
 .icon-btn[aria-expanded="true"]{border-color:#000}
 .menu-wrap{position:relative}
@@ -57,6 +58,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
   .game:hover{background:var(--hover)}
 }
 .game:focus-visible{background:var(--hover);outline-offset:3px}
+/* touch screens have no hover: the rims are in colour from the start */
+@media (hover:none),(pointer:coarse){.game{background:var(--hover)}}
 
 /* the three pictures, placed exactly as in the design: a drawn outline under a photo cut-out */
 .dice .outline{left:-.91px;top:-.8px;width:76.442px;height:70.934px;display:flex;align-items:center;justify-content:center}
@@ -93,9 +96,13 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
 <div class="wrap">
   <header>
     <div><h1>Ночёвка</h1><p class="sub">Игры из детства</p></div>
+    <div class="head-actions">
+    <button class="icon-btn" id="soundBtn" type="button"><img id="soundIco" src="assets/sound-on.svg" width="20" height="20" alt=""></button>
+    <button class="icon-btn" id="musicBtn" type="button"><img id="musicIco" src="assets/music-on.svg" width="20" height="20" alt=""></button>
     <div class="menu-wrap" id="menuWrap">
       <button class="icon-btn" id="menuBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="menu" aria-label="Меню"><img src="assets/menu-dots-figma.svg" width="20" height="20" alt=""></button>
       <div class="menu" id="menu" role="menu" hidden><button class="menu-item" id="aboutBtn" type="button" role="menuitem">Что это такое?</button></div>
+    </div>
     </div>
   </header>
   <main class="games">
@@ -171,6 +178,64 @@ document.querySelectorAll('.game').forEach(card=>{
   });
   card.addEventListener('pointerleave',()=>{pic.style.translate='';});
 });
+
+/* ---------- sound and music: the same switches and the same track as in the games; the choice is shared by the whole site ---------- */
+const store={get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const SOUND={on:store.get('nochevka-sound')!=='off',ctx:null,tap:null};
+function audioCtx(){
+  if(SOUND.ctx)return SOUND.ctx;
+  const C=window.AudioContext||window.webkitAudioContext;
+  if(C)SOUND.ctx=new C();
+  return SOUND.ctx;
+}
+const decode=url=>fetch(url).then(r=>r.arrayBuffer()).then(a=>new Promise((res,rej)=>audioCtx().decodeAudioData(a,res,rej)));
+if(audioCtx())decode('sounds/tap.mp3').then(b=>{SOUND.tap=b;}).catch(()=>{});
+function tap(){
+  if(!SOUND.on||!SOUND.tap)return;
+  const ctx=audioCtx();if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+  const src=ctx.createBufferSource();src.buffer=SOUND.tap;src.connect(ctx.destination);src.start();
+}
+const soundBtn=document.getElementById('soundBtn');
+function paintSound(){document.getElementById('soundIco').src=SOUND.on?'assets/sound-on.svg':'assets/sound-off.svg';soundBtn.setAttribute('aria-label',SOUND.on?'Выключить звук':'Включить звук');}
+soundBtn.addEventListener('click',()=>{SOUND.on=!SOUND.on;store.set('nochevka-sound',SOUND.on?'on':'off');paintSound();tap();});
+// a soft tap on every button and game card
+document.addEventListener('click',e=>{const b=e.target.closest('button,a.game');if(!b||b===soundBtn)return;tap();},true);
+paintSound();
+
+const MUSIC={on:store.get('nochevka-music')!=='off',buf:null,src:null,gain:null,loading:null,wanted:false,volume:0.25};
+const musicBtn=document.getElementById('musicBtn');
+function loadMusic(){
+  if(!audioCtx()||MUSIC.loading)return;
+  MUSIC.loading=decode('sounds/music.mp3').then(b=>{MUSIC.buf=b;if(MUSIC.wanted)startMusic();}).catch(()=>{});
+}
+// the track is cut to whole bars; loop exactly the musical part (see «Уголки» for the numbers)
+const MUSIC_LEN=3233684/48000,MUSIC_DELAY=528/48000;
+function musicBounds(b){
+  if(b.duration-MUSIC_LEN>0.02)return[MUSIC_DELAY,MUSIC_DELAY+MUSIC_LEN];
+  return[0,Math.min(MUSIC_LEN,b.duration)];
+}
+function startMusic(){
+  MUSIC.wanted=true;
+  const ctx=audioCtx();if(!ctx||!MUSIC.on||MUSIC.src)return;
+  if(!MUSIC.buf){loadMusic();return;}
+  if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+  const g=ctx.createGain(),src=ctx.createBufferSource(),[a,b]=musicBounds(MUSIC.buf);
+  g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(MUSIC.volume,ctx.currentTime+1.5);
+  src.buffer=MUSIC.buf;src.loop=true;src.loopStart=a;src.loopEnd=b;
+  src.connect(g);g.connect(ctx.destination);src.start(0,a);
+  MUSIC.src=src;MUSIC.gain=g;
+}
+function stopMusic(){
+  if(!MUSIC.src)return;
+  const ctx=audioCtx(),src=MUSIC.src,g=MUSIC.gain,t=ctx.currentTime;MUSIC.src=null;
+  g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(g.gain.value,t);g.gain.linearRampToValueAtTime(0,t+0.4);src.stop(t+0.45);
+}
+function paintMusic(){document.getElementById('musicIco').src=MUSIC.on?'assets/music-on.svg':'assets/music-off.svg';musicBtn.setAttribute('aria-label',MUSIC.on?'Выключить музыку':'Включить музыку');}
+musicBtn.addEventListener('click',()=>{MUSIC.on=!MUSIC.on;store.set('nochevka-music',MUSIC.on?'on':'off');paintMusic();MUSIC.on?startMusic():stopMusic();});
+// browsers only allow sound after the first tap or click on the page
+document.addEventListener('pointerdown',()=>{const c=audioCtx();if(c&&c.state==='suspended')c.resume().catch(()=>{});if(MUSIC.on&&!MUSIC.src)startMusic();},{passive:true});
+document.addEventListener('visibilitychange',()=>{const c=SOUND.ctx;if(!c)return;document.hidden?c.suspend().catch(()=>{}):c.resume().catch(()=>{});});
+paintMusic();loadMusic();
 </script>
 </body>
 </html>

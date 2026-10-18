@@ -10,7 +10,7 @@
 /* Same look as «Уголки»: header row, then the framed board on the left and a 392px column of cards on the right; stacks on phones */
 :root{
   --bg:#f5eed9; --card:#fcf9f1; --line:#d5cfbe; --ink:#000; --text:#575757; --muted:#9c9c9c;
-  --frame:#e8c78a; --frame-ink:#865931; --sq-light:#e8d3ad; --sq-dark:#a8774b; --sq-ink:#3f2c09; --ring:#d99a1e; --yellow:#ffca57; --hint:#efece5; --disabled:#ccc4b1; --six:#4c8810; --danger:#c0392b;
+  --frame:#e8c78a; --frame-ink:#865931; --sq-light:#e8d3ad; --sq-dark:#a8774b; --sq-ink:#3f2c09; --ring:#d99a1e; --yellow:#ffca57; --accent:#8ddd68; --accent-hover:#7bd153; /* each game has its own colour, same as its card on the home page */ --hint:#efece5; --disabled:#ccc4b1; --six:#4c8810; --danger:#c0392b;
   --f-head:"Sawarabi Gothic","Helvetica Neue",Arial,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   --f-lbl:Helvetica,Arial,sans-serif;
@@ -32,6 +32,11 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .menu-item{display:block;width:100%;border:0;border-radius:10px;padding:16px 17px;text-align:left;white-space:nowrap}
 /* the game title doubles as the way back to all the games */
 .home-link{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;min-width:0}
+/* one line for the subtitle, so the header is the same 47px on every page and screen; on a narrow phone it ends in «…» */
+.home-link>div{min-width:0}
+.home-link .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* phones: no subtitle in the game header, the title alone; the header keeps the same 47px as on the home page */
+@media (max-width:680px){.home-link .sub{display:none}header{min-height:47px}}
 .home-link .back{flex:none;width:20px;height:20px;rotate:90deg;transition:translate .15s}
 @media (hover:hover) and (pointer:fine){.home-link:hover .back{translate:-3px 0}}
 .home-link:focus-visible{outline:3px solid var(--yellow);outline-offset:4px;border-radius:8px}
@@ -97,12 +102,12 @@ button:not(:disabled):active{transform:translateY(1px)}
   .field .pc.can:hover{transform:translate(-50%,-50%) scale(1.08)}
   button:not(:disabled):hover{background:rgba(0,0,0,.06)}
   button[aria-pressed="true"]:hover{background:#2b2b2b}
-  .btn-main:not(:disabled):hover{background:#ffbd2e}
+  .btn-main:not(:disabled):hover{background:var(--accent-hover)}
   input[type="text"]:hover{background:rgba(0,0,0,.03)}
   details.card summary:hover .chev{opacity:.6}
 }
 button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
-.btn-main{background:var(--yellow);width:100%;padding:8px 42px}
+.btn-main{background:var(--accent);width:100%;padding:8px 42px}
 .btn-main:disabled{background:var(--disabled);opacity:.4;cursor:default}
 input[type="text"]{font:inherit;text-transform:uppercase;color:#000;background:transparent;border:1px solid #000;border-radius:12px;padding:8px 18px;line-height:24px;width:100%;min-width:0;transition:background-color .12s}
 input[type="text"]::placeholder{color:rgba(0,0,0,.37)}
@@ -160,7 +165,7 @@ details.card[open] summary{padding-bottom:16px;border-bottom:1px solid var(--lin
 .emoji-pop button{width:36px;height:36px;padding:0;border:0;border-radius:10px;font-size:20px;line-height:1;text-transform:none}
 @media (pointer:coarse){.emoji-wrap{display:none}}
 .chat-btn{position:relative}
-.badge{position:absolute;left:22px;top:5.5px;min-width:14px;height:14px;padding:0 2px;border-radius:99px;background:var(--yellow);color:#000;font:600 8px/14px var(--f-mono);letter-spacing:-.04em;text-align:center}
+.badge{position:absolute;left:22px;top:5.5px;min-width:14px;height:14px;padding:0 2px;border-radius:99px;background:var(--accent);color:#000;font:600 8px/14px var(--f-mono);letter-spacing:-.04em;text-align:center}
 .chat-head{display:flex;align-items:center;justify-content:space-between}
 .card-sub{font-family:var(--f-head);font-weight:400;font-size:18px;line-height:24px;letter-spacing:-.03em;margin:0}
 .chat-close{display:none;border:0;padding:0;width:32px;height:32px;font-size:24px;line-height:1;text-transform:none}
@@ -621,7 +626,7 @@ function maybeBot(){
 }
 
 /* ---------- sound ---------- */
-const SOUND={on:store.get('chapaev-sound')!=='off',ctx:null,buf:{},loading:{}};
+const SOUND={on:store.get('nochevka-sound')!=='off',ctx:null,buf:{},loading:{}};
 const SOUND_NAMES=['step','capture','six','home','turn','win','lose','tap','send','message'];
 function audioCtx(){
   if(SOUND.ctx)return SOUND.ctx;
@@ -649,12 +654,12 @@ SOUND_NAMES.forEach(loadSound);
 document.addEventListener('pointerdown',()=>{const c=audioCtx();if(c&&c.state==='suspended')c.resume().catch(()=>{});},{passive:true});
 const soundBtn=document.getElementById('soundBtn');
 function paintSound(){document.getElementById('soundIco').src=SOUND.on?'assets/sound-on.svg':'assets/sound-off.svg';soundBtn.setAttribute('aria-label',SOUND.on?'Выключить звук':'Включить звук');}
-soundBtn.addEventListener('click',()=>{SOUND.on=!SOUND.on;store.set('chapaev-sound',SOUND.on?'on':'off');paintSound();if(SOUND.on)sfx('tap');});
+soundBtn.addEventListener('click',()=>{SOUND.on=!SOUND.on;store.set('nochevka-sound',SOUND.on?'on':'off');paintSound();if(SOUND.on)sfx('tap');});
 document.addEventListener('click',e=>{const b=e.target.closest('button,summary');if(!b||b.disabled||b===soundBtn||b.id==='chatSend')return;sfx('tap');},true);
 paintSound();
 
 /* ---------- background music (same track and loop as «Уголки») ---------- */
-const MUSIC={on:store.get('chapaev-music')!=='off',buf:null,src:null,gain:null,loading:null,wanted:false,volume:0.25};
+const MUSIC={on:store.get('nochevka-music')!=='off',buf:null,src:null,gain:null,loading:null,wanted:false,volume:0.25};
 const musicBtn=document.getElementById('musicBtn');
 function loadMusic(){
   const ctx=audioCtx();if(!ctx||MUSIC.loading)return;
@@ -683,7 +688,7 @@ function stopMusic(){
   g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(g.gain.value,t);g.gain.linearRampToValueAtTime(0,t+0.4);src.stop(t+0.45);
 }
 function paintMusic(){document.getElementById('musicIco').src=MUSIC.on?'assets/music-on.svg':'assets/music-off.svg';musicBtn.setAttribute('aria-label',MUSIC.on?'Выключить музыку':'Включить музыку');}
-musicBtn.addEventListener('click',()=>{MUSIC.on=!MUSIC.on;store.set('chapaev-music',MUSIC.on?'on':'off');paintMusic();MUSIC.on?startMusic():stopMusic();});
+musicBtn.addEventListener('click',()=>{MUSIC.on=!MUSIC.on;store.set('nochevka-music',MUSIC.on?'on':'off');paintMusic();MUSIC.on?startMusic():stopMusic();});
 document.addEventListener('pointerdown',()=>{if(MUSIC.on&&!MUSIC.src)startMusic();},{passive:true});
 document.addEventListener('visibilitychange',()=>{const c=SOUND.ctx;if(!c)return;document.hidden?c.suspend().catch(()=>{}):c.resume().catch(()=>{});});
 paintMusic();loadMusic();
