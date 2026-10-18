@@ -89,11 +89,11 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
 
 
 /* ---------- below the cards: notes in the middle, jam-water on the left, the exercise disk on the right ---------- */
-.extras{position:relative;margin-top:118px;min-height:620px}
+.extras{position:relative;margin-top:118px;min-height:760px}
 /* wide screens: the jar set (left) and the disk (right) keep the design's vertical distance between them (392px),
-   and the pair — from the top of the disk to the jar caption — sits in the middle of the notes grid itself
-   (not counting the title or the «show more» button); the grid's place is measured in script */
-.deco{position:absolute;left:0;right:0;top:var(--nt,71px);height:var(--nh,550px);pointer-events:none}
+   and the pair — from the top of the disk to the jar caption — sits in the middle of the first three rows of notes (the first 6):
+   the same spot whether the notes are still loading, there are only a few, or many more were opened, so nothing jumps */
+.deco{position:absolute;left:0;right:0;top:71px;height:663px;pointer-events:none}
 .deco>*{pointer-events:auto}
 .notes-col{width:472px;margin:0 auto}
 .notes-head{display:flex;align-items:center;gap:24px}
@@ -404,15 +404,11 @@ const notesEl=document.getElementById('notes'),moreWrap=document.getElementById(
 let limit=FIRST,unsub=null,mockNotes=[];
 const ddmmyy=ts=>{const d=new Date(ts);return [d.getDate(),d.getMonth()+1,d.getFullYear()%100].map(n=>String(n).padStart(2,'0')).join('.');};
 let latestNotes=[]; // newest first, as shown
-const decoEl=document.querySelector('.deco');
-function placeDeco(){decoEl.style.setProperty('--nt',notesEl.offsetTop+'px');decoEl.style.setProperty('--nh',Math.max(notesEl.offsetHeight,120)+'px');}
-new ResizeObserver(placeDeco).observe(notesEl);
 function renderNotes(list,more){
   latestNotes=list;
   notesEl.innerHTML=list.length?list.map(n=>`<article class="note c${n.color}">${n.type==='draw'?`<img class="pic" src="${n.img}" alt="Рисунок">`:`<p>${esc(n.text)}</p>`}<div class="meta"><span>${esc(n.name)}</span><span>${n.ts?ddmmyy(n.ts):''}</span></div></article>`).join('')
     :'<p class="notes-empty">Тут пока пусто. Оставь первую записку!</p>';
   moreWrap.hidden=!more;
-  placeDeco();
 }
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 async function listen(){
