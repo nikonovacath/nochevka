@@ -59,6 +59,24 @@
           }
         }
       }
+    },
+    "nochevka": {
+      "notes": {
+        ".read": true,
+        ".indexOn": [
+          "ts"
+        ],
+        "$id": {
+          ".write": "auth != null && !data.exists() && newData.exists()",
+          ".validate": "newData.hasChildren(['type', 'name', 'color', 'ts', 'uid']) && newData.child('uid').val() === auth.uid && newData.child('ts').val() === now && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 20 && newData.child('color').isNumber() && newData.child('color').val() >= 1 && newData.child('color').val() <= 4 && ((newData.child('type').val() === 'text' && newData.child('text').isString() && newData.child('text').val().length >= 1 && newData.child('text').val().length <= 150 && !newData.hasChild('img')) || (newData.child('type').val() === 'draw' && newData.child('img').isString() && newData.child('img').val().beginsWith('data:image/png;base64,') && newData.child('img').val().length <= 150000 && !newData.hasChild('text'))) && newData.parent().parent().child('last').child(auth.uid).val() === now"
+        }
+      },
+      "last": {
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.val() === now && (!data.exists() || data.val() < now - 60000)"
+        }
+      }
     }
   }
 }

@@ -87,6 +87,112 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
 .pop-text{margin:0;color:var(--text);text-transform:uppercase;line-height:20px}
 .pop hr{height:1px;background:var(--line);border:0;margin:0}
 
+
+/* ---------- below the cards: notes in the middle, jam-water on the left, the exercise disk on the right ---------- */
+.extras{position:relative;margin-top:118px;min-height:770px}
+.notes-col{width:472px;margin:0 auto}
+.notes-head{display:flex;align-items:center;gap:24px}
+.notes-head>div{flex:1;min-width:0}
+.notes-head h2{font-family:var(--f-head);font-weight:400;font-size:24px;line-height:26px;letter-spacing:-.03em;margin:0}
+.btn-light{background:var(--card);border:1.5px solid #000;border-radius:12px;padding:8px 20px;font-size:14px;line-height:24px;white-space:nowrap}
+@media (hover:hover) and (pointer:fine){.btn-light:hover{background:#f1ecdf}}
+.notes{display:grid;grid-template-columns:230px 230px;justify-content:center;margin-top:24px}
+.note{width:230px;height:230px;padding:24px;border:1px solid var(--line);border-radius:20px;display:flex;flex-direction:column;justify-content:space-between;
+  font-size:12px;line-height:18px;overflow:hidden;rotate:-3deg;margin-bottom:-9px}
+.note p{margin:0;overflow-wrap:anywhere}
+.note .meta{display:flex;justify-content:space-between;color:var(--text);text-transform:uppercase;white-space:nowrap}
+.note{position:relative;transition:rotate .2s,scale .2s,box-shadow .2s}
+/* the tilt pattern of the design repeats every four notes */
+.note:nth-child(4n+2){rotate:3deg;translate:-4px 20px}
+.note:nth-child(4n+3){rotate:3deg;translate:4px 0}
+.note:nth-child(4n+4){rotate:-3deg;translate:0 20px}
+.note p{white-space:pre-wrap}
+.note .pic{display:block;width:100%;height:auto;flex:1;min-height:0;object-fit:contain;object-position:left top}
+/* hover: the note comes on top of the others and straightens up a little */
+@media (hover:hover) and (pointer:fine){.note:hover{z-index:2;rotate:0deg;scale:1.04;box-shadow:0 8px 24px -6px rgba(0,0,0,.22)}}
+.notes-empty{grid-column:1/-1;margin:8px 0 0;font-size:12px;line-height:18px;color:var(--text);text-transform:uppercase;text-align:center}
+.more-wrap{display:flex;justify-content:center;margin-top:48px}
+
+/* new note popup */
+.pop-new{max-width:420px;gap:18px}
+.seg{display:flex;gap:10px}
+.seg button{padding:8px 16px}
+.seg button[aria-pressed="true"]{background:#000;color:#fff}
+.field-lab{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;line-height:18px;color:var(--text);text-transform:uppercase;margin:0 0 6px}
+.field-lab .count.over{color:#c0392b}
+.pop-new textarea,.pop-new input[type=text]{font:inherit;color:#000;background:transparent;border:1px solid #000;border-radius:12px;padding:10px 14px;width:100%;line-height:20px;resize:none}
+.pop-new textarea{height:126px}
+.pop-new textarea::placeholder,.pop-new input::placeholder{color:rgba(0,0,0,.37)}
+.pop-new textarea:focus-visible,.pop-new input:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+@media (pointer:coarse){.pop-new textarea,.pop-new input[type=text]{font-size:16px}}
+.pad{position:relative;border:1px solid #000;border-radius:12px;overflow:hidden;background:var(--pad,#ffda95)}
+.pad canvas{display:block;width:100%;aspect-ratio:182/150;touch-action:none;cursor:crosshair}
+.pad-tools{position:absolute;right:8px;bottom:8px;display:flex;gap:6px}
+.pad-tools .icon-btn{background:var(--card);border-color:#000;width:36px;height:36px}
+.pad-tools .icon-btn:disabled{opacity:.35;cursor:default}
+.pad-hint{position:absolute;left:12px;top:10px;font-size:12px;line-height:18px;color:rgba(0,0,0,.45);text-transform:uppercase;pointer-events:none}
+.err{margin:0;font-size:12px;line-height:18px;color:#c0392b;text-transform:uppercase}
+.btn-main{background:var(--yellow);border:1.5px solid #000;width:100%;padding:9px 20px;font-size:14px;line-height:24px}
+.btn-main:disabled{opacity:.4;cursor:default}
+@media (hover:hover) and (pointer:fine){.btn-main:not(:disabled):hover{background:#ffbd2e}}
+.pop-new .stack{display:flex;flex-direction:column;gap:10px}
+/* small alert at the top after sending */
+.chip{position:fixed;left:50%;top:16px;z-index:60;translate:-50% -140%;background:var(--card);border:1.5px solid #000;border-radius:99px;padding:8px 18px;
+  font-size:12px;line-height:18px;text-transform:uppercase;box-shadow:0 6px 18px -6px rgba(0,0,0,.3);opacity:0;visibility:hidden;pointer-events:none;
+  transition:translate .3s cubic-bezier(.2,.8,.3,1),opacity .3s,visibility 0s .3s}
+.chip.on{translate:-50% 0;opacity:1;visibility:visible;transition:translate .3s cubic-bezier(.2,.8,.3,1),opacity .2s,visibility 0s}
+.note.c1{background:#ffda95}.note.c2{background:#ffcaca}.note.c3{background:#c4e9fc}.note.c4{background:#cdeaad}
+
+/* jam, cup and water jug: tap the jar or the jug to pour into the cup, tap the cup to drink */
+.jam{position:absolute;left:-14px;top:445px;width:189px;height:89px}
+.jam .obj{position:absolute;padding:0;border:0;background:none;border-radius:0;cursor:pointer;line-height:0;transition:translate .45s cubic-bezier(.45,0,.2,1),rotate .45s cubic-bezier(.45,0,.2,1)}
+.jam .obj img{width:100%;height:100%;display:block;pointer-events:none}
+.jam .jar{left:0;top:23px;width:64px;height:64px;z-index:3}
+.jam .cup{left:57px;top:37px;width:56px;height:56px;z-index:2}
+.jam .pitcher{left:100px;top:0;width:89px;height:89px;z-index:3}
+.jam .jar.pour{translate:21px -62px;rotate:110deg}
+.jam .pitcher.pour{translate:-31px -58px;rotate:-55deg}
+.jam .cup.drink{translate:0 -6px;rotate:-14deg}
+.jam .liquid{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:multiply;opacity:.9;pointer-events:none}
+.jam .stream{position:absolute;left:79px;top:2px;width:4px;height:0;border-radius:2px;z-index:4;pointer-events:none;transition:height .12s linear}
+.jam-cap{position:absolute;left:50%;translate:-50% 0;top:104px;width:240px;text-align:center;margin:0;font-size:12px;line-height:18px;color:var(--text);text-transform:uppercase;transition:opacity .3s}
+@media (hover:hover) and (pointer:fine){.jam:not(.busy) .obj:hover{translate:0 -3px}}
+.jam .obj:focus-visible{outline:3px solid var(--yellow);outline-offset:2px;border-radius:8px}
+
+/* the exercise disk: still by default; tap to spin it, the motion lines show only while it turns */
+.disk-wrap{position:absolute;left:786px;top:53px;width:134px}
+.disk-cap{position:absolute;left:50%;translate:-50% 0;top:150px;width:220px;margin:0;font-size:12px;line-height:18px;color:var(--text);text-transform:uppercase;text-align:center;opacity:0;transition:opacity .3s;pointer-events:none}
+.disk-cap.on{opacity:1}
+.spinner{position:relative;display:block;width:134px;height:134px;padding:0;border:0;background:none;border-radius:50%;cursor:pointer}
+.spinner .ring{position:absolute;left:5px;top:4px;width:123px;height:121px;overflow:visible}
+.spinner .disk{position:absolute;inset:0;width:134px;height:134px;display:block;pointer-events:none}
+.spinner .arc{position:absolute;overflow:visible;opacity:0;pointer-events:none}
+.spinner .arc img{position:absolute;display:block;max-width:none;width:auto;height:auto}
+.spinner .a1{left:91.09px;top:1.57px;width:43.908px;height:63.934px}
+.spinner .a2{left:0;top:67px;width:43.908px;height:63.934px;rotate:180deg}
+.spinner .a1 img,.spinner .a2 img{inset:-.73% -1.14% 0 -.41%;width:calc(100% + 1.55%);height:calc(100% + .73%)}
+.spinner .a3{left:0;top:99px;width:16px;height:24px;rotate:180deg}
+.spinner .a4{left:112px;top:9px;width:28.607px;height:24.986px;display:flex;align-items:center;justify-content:center}
+.spinner .a4>div{position:relative;flex:none;width:16px;height:24px;rotate:-63.67deg;scale:1 -1}
+.spinner .a3 img,.spinner .a4 img{inset:-1.94% -3.13% 0 -1.15%;width:calc(100% + 4.28%);height:calc(100% + 1.94%)}
+.spinner:focus-visible{outline:3px solid var(--yellow);outline-offset:4px}
+
+/* when there is no room beside the notes: the jar set and the disk go under the notes, one below the other */
+@media (max-width:960px){
+  .extras{min-height:0;display:flex;flex-direction:column;align-items:center;gap:96px}
+  .deco{display:flex;flex-direction:column;align-items:center;gap:32px;order:1}
+  .jam,.disk-wrap{position:relative;left:auto;top:auto;flex:none}
+  .disk-wrap{height:190px}
+  .jam{height:126px}
+}
+@media (max-width:520px){
+  .notes-col{width:100%}
+  .notes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .note{width:auto;height:auto;aspect-ratio:1;padding:16px;font-size:11px;line-height:16px}
+  .notes-head{flex-wrap:wrap;gap:12px}
+}
+@media (prefers-reduced-motion:reduce){.jam .obj{transition:none}}
+
 @media (max-width:960px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:620px){.games{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){.game .pic-in{transition:none}}
@@ -143,7 +249,76 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-off
       </div>
     </div>
   </main>
+  <section class="extras">
+    <div class="deco">
+      <div class="jam" id="jam">
+        <button class="obj jar" id="jar" type="button" aria-label="Налить варенья в кружку"><img src="assets/jar.png" alt=""></button>
+        <button class="obj cup" id="cup" type="button" aria-label="Выпить"><img src="assets/cup.png" alt="">
+          <svg class="liquid" viewBox="0 0 100 100" aria-hidden="true">
+            <defs><clipPath id="cupIn"><path d="M23 26 L23.5 40 L24.5 60 Q25.5 70 29 74 Q33 77.5 43 77.5 Q53 77.5 57 74 Q60.5 70 61 60 L62 40 L62.5 26 Z"/></clipPath></defs>
+            <g clip-path="url(#cupIn)"><rect id="liqBody" x="0" y="78" width="100" height="40"/><ellipse id="liqTop" cx="42.8" cy="78" rx="19.6" ry="2.2"/></g>
+          </svg>
+        </button>
+        <button class="obj pitcher" id="pitcher" type="button" aria-label="Долить воды в кружку"><img src="assets/pitcher.png" alt=""></button>
+        <div class="stream" id="stream"></div>
+        <p class="jam-cap" id="jamCap" aria-live="polite">Налей себе</p>
+      </div>
+      <div class="disk-wrap">
+      <button class="spinner" id="spinner" type="button" aria-label="Раскрутить диск здоровья">
+        <svg class="ring" viewBox="0 0 126 124" aria-hidden="true"><ellipse cx="63" cy="62" rx="61.5" ry="60.5" fill="none" stroke="#000" stroke-width="3"/></svg>
+        <img class="disk" id="disk" src="assets/disk.png" alt="">
+        <span class="arc a1"><img src="assets/disk-arc1.svg" alt=""></span>
+        <span class="arc a2"><img src="assets/disk-arc2.svg" alt=""></span>
+        <span class="arc a3"><img src="assets/disk-arc3.svg" alt=""></span>
+        <span class="arc a4"><div><img src="assets/disk-arc4.svg" alt=""></div></span>
+      </button>
+      <p class="disk-cap" id="diskCap" aria-live="polite">Ну всё, ты готов-а в космонавты</p>
+      </div>
+    </div>
+    <div class="notes-col">
+      <div class="notes-head">
+        <div><h2>Записки</h2><p class="sub">Тут можно оставить пару слов на память</p></div>
+        <button class="btn-light" id="newNoteBtn" type="button">Оставить свою</button>
+      </div>
+      <div class="notes" id="notes" aria-live="polite"><p class="notes-empty">Загружаем записки…</p></div>
+      <div class="more-wrap" id="moreWrap" hidden><button class="btn-light" id="moreBtn" type="button">Загрузить ещё</button></div>
+    </div>
+  </section>
 </div>
+<div class="backdrop" id="newNote" hidden>
+  <form class="pop pop-new" role="dialog" aria-modal="true" aria-labelledby="newTitle" id="noteForm" autocomplete="off" novalidate>
+    <div class="pop-head"><p class="pop-title" id="newTitle">Новая записка</p><button class="pop-close" id="newClose" type="button" aria-label="Закрыть">×</button></div>
+    <hr>
+    <div class="seg" role="group" aria-label="Что оставить">
+      <button type="button" data-kind="text" aria-pressed="true">Текст</button>
+      <button type="button" data-kind="draw" aria-pressed="false">Рисунок</button>
+    </div>
+    <div id="textBox">
+      <label class="field-lab" for="noteText"><span>Что хочешь сказать?</span><span class="count" id="noteCount">0 / 150</span></label>
+      <textarea id="noteText" maxlength="150" placeholder="Напиши пару слов на память"></textarea>
+    </div>
+    <div id="drawBox" hidden>
+      <p class="field-lab"><span>Нарисуй что-нибудь</span></p>
+      <div class="pad" id="pad">
+        <canvas id="padCanvas" width="728" height="600" aria-label="Поле для рисунка"></canvas>
+        <span class="pad-hint" id="padHint">Рисуй пальцем или мышкой</span>
+        <div class="pad-tools">
+          <button class="icon-btn" id="padUndo" type="button" aria-label="Отменить" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+          <button class="icon-btn" id="padClear" type="button" aria-label="Стереть всё" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <label class="field-lab" for="noteName"><span>Подпись</span></label>
+      <input type="text" id="noteName" maxlength="20" placeholder="Твоё имя" autocomplete="nickname">
+    </div>
+    <div class="stack">
+      <p class="err" id="noteErr" hidden></p>
+      <button class="btn-main" id="noteSend" type="submit" disabled>Отправить</button>
+    </div>
+  </form>
+</div>
+<div class="chip" id="chip" role="status" aria-live="polite"></div>
 <div class="backdrop" id="about" hidden>
   <div class="pop" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
     <div class="pop-head"><p class="pop-title" id="aboutTitle">Что это такое?</p><button class="pop-close" id="aboutClose" type="button" aria-label="Закрыть">×</button></div>
@@ -179,9 +354,253 @@ document.querySelectorAll('.game').forEach(card=>{
   card.addEventListener('pointerleave',()=>{pic.style.translate='';});
 });
 
+/* ---------- notes: anyone can leave a short text or a little black drawing; kept in Firebase (same project as the games) ---------- */
+const FB_CONFIG={
+  apiKey:"AIzaSyDMcyQPFdDdbM4PUl5qbpV8gRTxMJnVp4g",
+  authDomain:"ugolki-d70b8.firebaseapp.com",
+  databaseURL:"https://ugolki-d70b8-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"ugolki-d70b8",
+  storageBucket:"ugolki-d70b8.firebasestorage.app",
+  messagingSenderId:"90178556292",
+  appId:"1:90178556292:web:a8fde49939c553e8a4cdd1",
+};
+const FB_SDK='https://www.gstatic.com/firebasejs/10.12.2/';
+const NOTES_PATH='nochevka/notes',LAST_PATH='nochevka/last';
+const MOCK=new URLSearchParams(location.search).has('mock'); // ?mock keeps notes in this browser only, for trying things out
+const NOTE_MAX=150,NOTE_LINES=7,FIRST=8,MORE=16,COOLDOWN=60000;
+let fb=null,fbLoading=null,signing=null;
+async function firebase(){
+  if(fb)return fb;
+  if(!fbLoading)fbLoading=Promise.all(['firebase-app.js','firebase-auth.js','firebase-database.js'].map(f=>import(FB_SDK+f))).then(([a,au,d])=>{
+    const app=a.initializeApp(FB_CONFIG);fb={app,auth:au.getAuth(app),au,db:d.getDatabase(app),...d};return fb;});
+  return fbLoading;
+}
+// one anonymous visitor per browser: wait for the saved sign-in first, and never start two sign-ins at once
+async function signIn(){
+  const f=await firebase();
+  if(!signing)signing=(async()=>{await f.auth.authStateReady();if(!f.auth.currentUser)await f.au.signInAnonymously(f.auth);})().catch(e=>{signing=null;throw e;});
+  await signing;return f;
+}
+
+/* swear filter: a word counts if it starts with one of these roots (after a usual prefix), so «употреблять» or «колебаться» pass */
+const SWEAR=new RegExp('(?<!\\p{L})(?:'+[
+  '(?:за|вы|на|по|у|до|про|раз|рас|под|подъ|съ|въ|отъ|изъ|разъ|объ)?[её]б(?!онит)(?:\\p{L}*)',
+  'долбо[её]б\\p{L}*',
+  '(?:на|по|ни|от|до|за|о|ох)?ху[йеёяию]\\p{L}*',
+  '(?:вы)?бля(?:д\\p{L}*|т\\p{L}*)?(?!\\p{L})',
+  'сук(?:а|и|е|у|ой|ам|ами|ах)(?!\\p{L})','сучк\\p{L}*','сучар\\p{L}*',
+  'муда[кч]\\p{L}*','мудил\\p{L}*','мудозвон\\p{L}*',
+  'пид[оа]р\\p{L}*','педик\\p{L}*','гандон\\p{L}*','шлюх\\p{L}*','залуп\\p{L}*',
+].join('|')+')|пизд','iu');
+const LOOKALIKE={a:'а',e:'е',o:'о',p:'р',c:'с',x:'х',y:'у',k:'к',m:'м',t:'т',b:'в',h:'н','@':'а','0':'о','3':'з','6':'б'};
+const hasSwear=t=>SWEAR.test(t.toLowerCase().replace(/[aeopcxykmtbh@036]/g,ch=>LOOKALIKE[ch]||ch));
+
+const notesEl=document.getElementById('notes'),moreWrap=document.getElementById('moreWrap'),moreBtn=document.getElementById('moreBtn');
+let limit=FIRST,unsub=null,mockNotes=[];
+const ddmmyy=ts=>{const d=new Date(ts);return [d.getDate(),d.getMonth()+1,d.getFullYear()%100].map(n=>String(n).padStart(2,'0')).join('.');};
+function renderNotes(list,more){
+  notesEl.innerHTML=list.length?list.map(n=>`<article class="note c${n.color}">${n.type==='draw'?`<img class="pic" src="${n.img}" alt="Рисунок">`:`<p>${esc(n.text)}</p>`}<div class="meta"><span>${esc(n.name)}</span><span>${n.ts?ddmmyy(n.ts):''}</span></div></article>`).join('')
+    :'<p class="notes-empty">Тут пока пусто. Оставь первую записку!</p>';
+  moreWrap.hidden=!more;
+}
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function listen(){
+  if(MOCK){const l=mockNotes.slice().sort((a,b)=>b.ts-a.ts);renderNotes(l.slice(0,limit),l.length>limit);return;}
+  try{
+    const f=await firebase();
+    if(unsub)unsub();
+    // newest first; we ask for one more than we show, to know whether «load more» is needed
+    const q=f.query(f.ref(f.db,NOTES_PATH),f.orderByChild('ts'),f.limitToLast(limit+1));
+    unsub=f.onValue(q,snap=>{
+      const l=[];snap.forEach(c=>{const v=c.val();if(v&&v.name)l.push(v);});
+      l.sort((a,b)=>(b.ts||0)-(a.ts||0));
+      renderNotes(l.slice(0,limit),l.length>limit);
+    },()=>{notesEl.innerHTML='<p class="notes-empty">Не получилось загрузить записки. Попробуй обновить страницу.</p>';});
+  }catch(e){notesEl.innerHTML='<p class="notes-empty">Не получилось загрузить записки. Проверь интернет.</p>';}
+}
+moreBtn.addEventListener('click',()=>{limit+=MORE;listen();});
+listen();
+
+/* the popup */
+const newNote=document.getElementById('newNote'),noteForm=document.getElementById('noteForm'),noteText=document.getElementById('noteText'),
+  noteCount=document.getElementById('noteCount'),noteName=document.getElementById('noteName'),noteErr=document.getElementById('noteErr'),
+  noteSend=document.getElementById('noteSend'),textBox=document.getElementById('textBox'),drawBox=document.getElementById('drawBox');
+const NOTE={kind:'text',color:1};
+function openNote(){
+  NOTE.color=1+Math.floor(Math.random()*4);
+  document.getElementById('pad').style.setProperty('--pad',['#ffda95','#ffcaca','#c4e9fc','#cdeaad'][NOTE.color-1]);
+  noteName.value=store.get('nochevka-name');
+  newNote.hidden=false;showErr('');validate();
+  (NOTE.kind==='text'?noteText:noteName).focus();
+  if(!MOCK)signIn().catch(()=>{});
+}
+function closeNote(){newNote.hidden=true;document.getElementById('newNoteBtn').focus();}
+document.getElementById('newNoteBtn').addEventListener('click',openNote);
+document.getElementById('newClose').addEventListener('click',closeNote);
+newNote.addEventListener('click',e=>{if(e.target===newNote)closeNote();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!newNote.hidden)closeNote();});
+noteForm.querySelectorAll('[data-kind]').forEach(b=>b.addEventListener('click',()=>{
+  NOTE.kind=b.dataset.kind;
+  noteForm.querySelectorAll('[data-kind]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  textBox.hidden=NOTE.kind!=='text';drawBox.hidden=NOTE.kind!=='draw';
+  showErr('');validate();
+}));
+function showErr(t){noteErr.textContent=t;noteErr.hidden=!t;}
+function textOk(){const t=noteText.value.trim();return t.length>0&&t.length<=NOTE_MAX;}
+function validate(){
+  const n=noteText.value.length;noteCount.textContent=`${n} / ${NOTE_MAX}`;noteCount.classList.toggle('over',n>=NOTE_MAX);
+  noteSend.disabled=!(noteName.value.trim()&&(NOTE.kind==='text'?textOk():strokes.length));
+}
+noteText.addEventListener('input',()=>{
+  // no more lines than fit on the sticker
+  const lines=noteText.value.split('\n');if(lines.length>NOTE_LINES)noteText.value=lines.slice(0,NOTE_LINES).join('\n');
+  showErr('');validate();
+});
+noteName.addEventListener('input',()=>{showErr('');validate();});
+
+/* the drawing pad: one black brush; undo takes back the last stroke, the bin clears everything */
+const padCanvas=document.getElementById('padCanvas'),pctx=padCanvas.getContext('2d'),padUndo=document.getElementById('padUndo'),padClear=document.getElementById('padClear'),padHint=document.getElementById('padHint');
+let strokes=[],cur=null;
+function padPoint(e){const r=padCanvas.getBoundingClientRect();return[(e.clientX-r.left)/r.width*padCanvas.width,(e.clientY-r.top)/r.height*padCanvas.height];}
+function drawStroke(st){
+  pctx.lineWidth=7;pctx.lineCap='round';pctx.lineJoin='round';pctx.strokeStyle='#000';pctx.fillStyle='#000';
+  if(st.length===1){pctx.beginPath();pctx.arc(st[0][0],st[0][1],6,0,Math.PI*2);pctx.fill();return;}
+  pctx.beginPath();pctx.moveTo(st[0][0],st[0][1]);
+  for(let i=1;i<st.length-1;i++){const mx=(st[i][0]+st[i+1][0])/2,my=(st[i][1]+st[i+1][1])/2;pctx.quadraticCurveTo(st[i][0],st[i][1],mx,my);}
+  const l=st[st.length-1];pctx.lineTo(l[0],l[1]);pctx.stroke();
+}
+function redraw(){pctx.clearRect(0,0,padCanvas.width,padCanvas.height);strokes.forEach(drawStroke);padUndo.disabled=padClear.disabled=!strokes.length;padHint.hidden=!!strokes.length;validate();}
+padCanvas.addEventListener('pointerdown',e=>{e.preventDefault();try{padCanvas.setPointerCapture(e.pointerId);}catch(err){}cur=[padPoint(e)];strokes.push(cur);showErr('');redraw();});
+padCanvas.addEventListener('pointermove',e=>{if(!cur)return;cur.push(padPoint(e));redraw();});
+const endStroke=()=>{cur=null;};
+padCanvas.addEventListener('pointerup',endStroke);padCanvas.addEventListener('pointercancel',endStroke);
+padUndo.addEventListener('click',()=>{strokes.pop();redraw();});
+padClear.addEventListener('click',()=>{strokes=[];redraw();});
+// the stored picture is half the pad's size: plenty for the sticker, and small enough for the database
+function padImage(){const c=document.createElement('canvas');c.width=364;c.height=300;c.getContext('2d').drawImage(padCanvas,0,0,364,300);return c.toDataURL('image/png');}
+
+/* sending */
+const chip=document.getElementById('chip');let chipTimer=null;
+function showChip(t){chip.textContent=t;chip.classList.add('on');clearTimeout(chipTimer);chipTimer=setTimeout(()=>chip.classList.remove('on'),3000);}
+noteForm.addEventListener('submit',async e=>{
+  e.preventDefault();if(noteSend.disabled)return;
+  const name=noteName.value.trim(),text=noteText.value.trim();
+  if(hasSwear(name)||(NOTE.kind==='text'&&hasSwear(text))){showErr('Кому-то надо помыть рот с мылом');return;}
+  const last=+store.get('nochevka-note-last')||0;
+  if(Date.now()-last<COOLDOWN){showErr('Подожди немного, прежде чем писать снова');return;}
+  const note={type:NOTE.kind,name,color:NOTE.color};
+  if(NOTE.kind==='text')note.text=text;else note.img=padImage();
+  noteSend.disabled=true;noteSend.textContent='Отправляем…';
+  try{
+    if(MOCK){note.ts=Date.now();mockNotes.push(note);listen();}
+    else{
+      const f=await signIn(),uid=f.auth.currentUser.uid,key=f.push(f.ref(f.db,NOTES_PATH)).key;
+      // the note and «my last note time» go in together, so the database itself can refuse a second note within a minute
+      await f.update(f.ref(f.db),{[`${NOTES_PATH}/${key}`]:{...note,uid,ts:f.serverTimestamp()},[`${LAST_PATH}/${uid}`]:f.serverTimestamp()});
+    }
+    store.set('nochevka-note-last',String(Date.now()));store.set('nochevka-name',name);
+    noteText.value='';strokes=[];redraw();closeNote();showChip('Записка отправлена');
+  }catch(err){
+    showErr(/PERMISSION_DENIED|permission/i.test(String(err&&(err.code||err.message)))?'Не получилось: подожди минутку и попробуй снова':'Не получилось отправить. Проверь интернет');
+  }finally{noteSend.textContent='Отправить';validate();}
+});
+// test hook: nochevka.addMock(20) fills the ?mock board
+window.nochevka={hasSwear,get strokes(){return strokes},addMock(n){for(let i=0;i<n;i++)mockNotes.push({type:'text',text:'Тестовая записка '+(i+1),name:'Тест',color:1+i%4,ts:Date.now()-(n-i)*60000});listen();}};
+
+/* ---------- jam water: pour jam and water into the cup in any order; tap the cup to drink it up ---------- */
+const jamEl=document.getElementById('jam'),jarBtn=document.getElementById('jar'),jugBtn=document.getElementById('pitcher'),cupBtn=document.getElementById('cup'),
+  streamEl=document.getElementById('stream'),liqBody=document.getElementById('liqBody'),liqTop=document.getElementById('liqTop'),jamCap=document.getElementById('jamCap');
+const CUP={bottom:77.5,top:33,jam:0,water:0,busy:false}; // levels in the cup drawing's units (0..100 down the picture)
+const JAM_RGB=[112,14,42],MIX_RGB=[222,84,118],WATER_RGB=[196,224,242]; // jam alone, jam with water (raspberry pink), water alone
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function level(){return CUP.bottom-(CUP.jam+CUP.water);}
+function liquidColour(){
+  const t=CUP.jam+CUP.water;if(!t)return 'transparent';
+  if(!CUP.jam)return `rgb(${WATER_RGB})`;
+  // the more water, the lighter: dark jam turns into a pink drink
+  const k=CUP.water/t,c=JAM_RGB.map((v,i)=>Math.round(v+(MIX_RGB[i]-v)*Math.min(1,k*1.4)));
+  return `rgb(${c})`;
+}
+function paintCup(){
+  const y=level(),col=liquidColour();
+  liqBody.setAttribute('y',y);liqBody.setAttribute('fill',col);
+  liqTop.setAttribute('cy',y);liqTop.setAttribute('fill',col);liqTop.setAttribute('opacity',CUP.jam+CUP.water?0.7:0);
+}
+function caption(){
+  jamCap.textContent=CUP.jam&&CUP.water?'Теперь у тебя есть вода с вареньем':CUP.jam?'Теперь долей воды':CUP.water?'Теперь добавь варенья':'Налей себе';
+}
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function animateLevel(key,to,ms){
+  const from=CUP[key],t0=performance.now();
+  return new Promise(res=>{const f=t=>{const k=Math.min(1,(t-t0)/ms);CUP[key]=from+(to-from)*ease(k);paintCup();
+    streamEl.style.height=Math.max(0,(37+level()/100*56)-2)+'px'; // the stream always reaches the surface
+    k<1?requestAnimationFrame(f):res();};requestAnimationFrame(f);});
+}
+async function pour(btn,key,amount,colour,sound){
+  if(CUP.busy)return;
+  const room=CUP.bottom-CUP.top-CUP.jam-CUP.water;
+  // each one pours only once; tap the cup to drink it up and start again
+  if(CUP[key]>0||room<1){btn.animate([{rotate:'0deg'},{rotate:'-6deg'},{rotate:'5deg'},{rotate:'0deg'}],{duration:350});return;} // full already
+  CUP.busy=true;jamEl.classList.add('busy');
+  btn.classList.add('pour');await wait(460);
+  sfx(sound);
+  streamEl.style.background=colour;streamEl.style.height=Math.max(0,(37+level()/100*56)-2)+'px';
+  await wait(120);
+  await animateLevel(key,CUP[key]+Math.min(amount,room),900);
+  streamEl.style.height='0';await wait(140);
+  btn.classList.remove('pour');await wait(460);
+  caption();CUP.busy=false;jamEl.classList.remove('busy');
+}
+jarBtn.addEventListener('click',()=>pour(jarBtn,'jam',15,'rgb(92,14,38)','pour-jam'));
+jugBtn.addEventListener('click',()=>pour(jugBtn,'water',30,'rgba(170,210,236,.9)','pour-water'));
+cupBtn.addEventListener('click',async()=>{
+  if(CUP.busy||!(CUP.jam+CUP.water))return;
+  CUP.busy=true;jamEl.classList.add('busy');cupBtn.classList.add('drink');sfx('drink');await wait(300);
+  const j=CUP.jam,w=CUP.water,t0=performance.now();
+  await new Promise(res=>{const f=t=>{const k=Math.min(1,(t-t0)/900),e=ease(k);CUP.jam=j*(1-e);CUP.water=w*(1-e);paintCup();k<1?requestAnimationFrame(f):res();};requestAnimationFrame(f);});
+  CUP.jam=CUP.water=0;paintCup();cupBtn.classList.remove('drink');await wait(300);
+  caption();CUP.busy=false;jamEl.classList.remove('busy');
+});
+paintCup();
+
+/* ---------- the exercise disk: each tap gives it a push, it slows down by itself; motion lines show its speed ---------- */
+const spinner=document.getElementById('spinner'),diskImg=document.getElementById('disk'),arcs=spinner.querySelectorAll('.arc');
+const DISK={angle:0,vel:0,last:0,running:false,taps:0,lastTap:0,src:null,gain:null},diskCap=document.getElementById('diskCap');
+let capTimer=null;
+function spinSound(on){
+  const ctx=audioCtx();if(!ctx)return;
+  if(on&&!DISK.src&&SOUND.buf.spin){
+    if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+    const g=ctx.createGain(),src=ctx.createBufferSource();g.gain.value=0;
+    src.buffer=SOUND.buf.spin;src.loop=true;src.connect(g);g.connect(ctx.destination);src.start(0,Math.random()*2);
+    DISK.src=src;DISK.gain=g;
+  }
+  if(!on&&DISK.src){const src=DISK.src,g=DISK.gain,t=ctx.currentTime;DISK.src=null;g.gain.setTargetAtTime(0,t,0.05);src.stop(t+0.3);}
+}
+function spinFrame(t){
+  const dt=Math.min(0.05,(t-DISK.last)/1000);DISK.last=t;
+  DISK.angle=(DISK.angle+DISK.vel*dt)%360;
+  DISK.vel=Math.max(0,DISK.vel*Math.exp(-0.9*dt)-40*dt);
+  diskImg.style.rotate=DISK.angle+'deg';
+  if(DISK.gain)DISK.gain.gain.setTargetAtTime(SOUND.on?Math.min(1,DISK.vel/900)*0.4:0,SOUND.ctx.currentTime,0.05);
+  const op=Math.min(1,DISK.vel/350);
+  // the lines flicker a little, like a quick sketch of motion
+  arcs.forEach((a,i)=>{a.style.opacity=op?Math.max(0,op*(0.75+0.25*Math.sin(t/60+i*1.7))).toFixed(2):'0';});
+  if(DISK.vel>0)requestAnimationFrame(spinFrame);
+  else{DISK.running=false;arcs.forEach(a=>a.style.opacity='0');spinSound(false);DISK.taps=0;capTimer=setTimeout(()=>diskCap.classList.remove('on'),1500);}
+}
+spinner.addEventListener('click',()=>{
+  // three or more taps in a row (each within a moment of the last) earn the cosmonaut line
+  const now=performance.now();DISK.taps=now-DISK.lastTap<1200?DISK.taps+1:1;DISK.lastTap=now;
+  if(DISK.taps>=3){clearTimeout(capTimer);diskCap.classList.add('on');}
+  spinSound(true);
+  DISK.vel=Math.min(1800,DISK.vel+700);
+  if(!DISK.running){DISK.running=true;DISK.last=performance.now();requestAnimationFrame(spinFrame);}
+});
+
 /* ---------- sound and music: the same switches and the same track as in the games; the choice is shared by the whole site ---------- */
 const store={get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
-const SOUND={on:store.get('nochevka-sound')!=='off',ctx:null,tap:null};
+const SOUND={on:store.get('nochevka-sound')!=='off',ctx:null,buf:{}};
 function audioCtx(){
   if(SOUND.ctx)return SOUND.ctx;
   const C=window.AudioContext||window.webkitAudioContext;
@@ -189,17 +608,18 @@ function audioCtx(){
   return SOUND.ctx;
 }
 const decode=url=>fetch(url).then(r=>r.arrayBuffer()).then(a=>new Promise((res,rej)=>audioCtx().decodeAudioData(a,res,rej)));
-if(audioCtx())decode('sounds/tap.mp3').then(b=>{SOUND.tap=b;}).catch(()=>{});
-function tap(){
-  if(!SOUND.on||!SOUND.tap)return;
+if(audioCtx())[['tap','mp3'],['pour-jam','mp3'],['pour-water','mp3'],['drink','mp3'],['spin','wav']].forEach(([n,ext])=>decode('sounds/'+n+'.'+ext).then(b=>{SOUND.buf[n]=b;}).catch(()=>{}));
+function sfx(name){
+  const b=SOUND.buf[name];if(!SOUND.on||!b)return;
   const ctx=audioCtx();if(ctx.state==='suspended')ctx.resume().catch(()=>{});
-  const src=ctx.createBufferSource();src.buffer=SOUND.tap;src.connect(ctx.destination);src.start();
+  const src=ctx.createBufferSource();src.buffer=b;src.connect(ctx.destination);src.start();
 }
+const tap=()=>sfx('tap');
 const soundBtn=document.getElementById('soundBtn');
 function paintSound(){document.getElementById('soundIco').src=SOUND.on?'assets/sound-on.svg':'assets/sound-off.svg';soundBtn.setAttribute('aria-label',SOUND.on?'Выключить звук':'Включить звук');}
 soundBtn.addEventListener('click',()=>{SOUND.on=!SOUND.on;store.set('nochevka-sound',SOUND.on?'on':'off');paintSound();tap();});
 // a soft tap on every button and game card
-document.addEventListener('click',e=>{const b=e.target.closest('button,a.game');if(!b||b===soundBtn)return;tap();},true);
+document.addEventListener('click',e=>{const b=e.target.closest('button,a.game');if(!b||b===soundBtn||b.closest('.jam')||b===spinner)return;tap();},true);
 paintSound();
 
 const MUSIC={on:store.get('nochevka-music')!=='off',buf:null,src:null,gain:null,loading:null,wanted:false,volume:0.25};
